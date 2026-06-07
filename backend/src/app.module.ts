@@ -1,0 +1,25 @@
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { AuthModule } from './modules/auth/auth.module';
+import { DatabaseModule } from './database/database.module';
+import { getDatabaseConfig } from './database/index';
+import { OauthModule } from './modules/oauth/oauth.module';
+import { UserModule } from './modules/user/user.module';
+
+@Module({
+  imports: [
+    TypeOrmModule.forRoot({
+      ...getDatabaseConfig(),
+      autoLoadEntities: true,
+    }),
+    AuthModule,
+    OauthModule,
+    DatabaseModule,
+    UserModule,
+  ],
+  controllers: [AppController],
+  providers: [AppService],
+})
+export class AppModule {}

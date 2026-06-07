@@ -1,0 +1,62 @@
+name: papyrus
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: papyrus
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ./backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend/.env
+    environment:
+      DATABASE_HOST: db
+      DATABASE_SYNCHRONIZE: "false"
+      RUN_MIGRATIONS: "true"
+      RUN_SEEDS: "true"
+      CORS_ORIGIN: http://localhost:3000
+      BETTER_AUTH_URL: http://localhost:3000
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:-papyrus-dev-secret-change-in-production-32chars}
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-papyrus-dev-secret-change-in-production-32chars}
+      JWT_ACCESS_TTL: ${JWT_ACCESS_TTL:-15m}
+      JWT_REFRESH_TTL: ${JWT_REFRESH_TTL:-7d}
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_API_URL: /api
+        API_ORIGIN: http://api:8000
+        JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-papyrus-dev-secret-change-in-production-32chars}
+    ports:
+      - "3000:3000"
+    environment:
+      HOSTNAME: "0.0.0.0"
+      PORT: "3000"
+      API_ORIGIN: http://api:8000
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-papyrus-dev-secret-change-in-production-32chars}
+    depends_on:
+      - api
+
+volumes:
+  postgres_data:
