@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { UserRole } from "./modules/users/constants/user-role.constants";
-import { appRoutes, FORBIDDEN_ROUTE } from "./lib/routes";
+import { appRoutes } from "./lib/routes";
 import type { ApiResponse } from "./lib/types";
 import type { User } from "./modules/users/types/user.type";
 
@@ -29,17 +28,6 @@ async function fetchCurrentUser(
   }
 }
 
-function isAdminOnlyUserPath(pathname: string): boolean {
-  if (pathname === "/users/create") {
-    return true;
-  }
-  const editMatch = /^\/users\/([^/]+)$/.exec(pathname);
-  if (!editMatch) {
-    return false;
-  }
-  return editMatch[1] !== "create";
-}
-
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isProtected = appRoutes.some(
@@ -63,16 +51,9 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(signInUrl);
   }
 
-  if (
-    isAdminOnlyUserPath(pathname) &&
-    user.role !== UserRole.Admin
-  ) {
-    return NextResponse.redirect(new URL(FORBIDDEN_ROUTE, request.url));
-  }
-
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/users", "/users/:path*"],
+  matcher: ["/workspace", "/workspace/:path*"],
 };

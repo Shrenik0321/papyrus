@@ -1,0 +1,44 @@
+---
+description: Only modify the repo when the user explicitly asks; never rename or remove apps/directories without permission
+alwaysApply: true
+---
+
+# Scope and user instructions
+
+## Default: read-only unless asked
+
+- Only create, edit, move, rename, or delete files when the user **explicitly** requests it in the current task.
+- Do not proactively refactor, reorganize, scaffold, or "improve" code the user did not mention.
+- Exploration and investigation are read-only. Findings belong in the response, not in unsolicited edits.
+
+## Forbidden without explicit instruction
+
+Never do these unless the user clearly asks:
+
+- Rename, move, duplicate, or delete top-level apps or directories (`backend/`, `frontend/`, `docker-compose*.yml`, etc.)
+- Delete or replace an entire module, app, or service
+- Start work on a different part of the repo than the user named (e.g. touching `backend/` during a frontend-only task)
+- Commit, push, or open PRs unless the user asks
+
+If a path looks wrong (e.g. `backend 2/` instead of `backend/`), **report it and ask** — do not rename, copy, or delete to "fix" it on your own.
+
+## Stay in scope
+
+- Implement only what the latest user message requests. Prior chat context informs intent; it does not grant permission to change unrelated files.
+- Prefer the smallest correct diff. Do not edit files outside the requested scope.
+- If the task is unclear or would require structural changes, ask before acting.
+
+## Examples
+
+```
+User: "Fix the sign-in page styling"
+✅ Edit frontend sign-in files only
+❌ Delete backend/, create backend 2/, or refactor auth service
+
+User: "How does auth work?"
+✅ Read code and explain
+❌ Add migrations, new endpoints, or rename directories
+
+User: "Revert backend changes and delete backend 2/"
+✅ Restore backend/ and remove backend 2/ as instructed
+```

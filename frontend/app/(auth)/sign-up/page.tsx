@@ -28,19 +28,19 @@ export default function SignUpPage() {
       return;
     }
 
-    window.location.assign("/dashboard");
+    window.location.assign("/workspace");
   };
 
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-2 text-center">
-        <h1 className="text-2xl font-bold tracking-tight">Create an account</h1>
+        <h1 className="font-heading text-2xl font-bold tracking-tight">Create an account</h1>
         <p className="text-sm text-muted-foreground">
           Get started with Papyrus.
         </p>
       </div>
 
-      <GoogleSignInButton callbackUrl="/dashboard" />
+      <GoogleSignInButton callbackUrl="/workspace" />
 
       <div className="relative">
         <div className="absolute inset-0 flex items-center">

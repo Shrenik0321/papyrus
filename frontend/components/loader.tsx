@@ -25,6 +25,42 @@ export function SkeletonCard() {
   )
 }
 
+export function SkeletonPaperCard() {
+  return (
+    <div className="rounded-xl border border-border bg-card p-4">
+      <Skeleton className="mb-3 h-5 w-3/4" />
+      <Skeleton className="mb-2 h-4 w-1/2" />
+      <div className="flex gap-2">
+        <Skeleton className="h-5 w-16 rounded-full" />
+        <Skeleton className="h-5 w-20 rounded-full" />
+      </div>
+    </div>
+  )
+}
+
+export function SkeletonActivityGrid({ count = 3 }: { count?: number }) {
+  return (
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {Array.from({ length: count }).map((_, i) => (
+        <div key={i} className="rounded-xl border border-border bg-card p-4">
+          <Skeleton className="mb-3 h-4 w-16 rounded-full" />
+          <Skeleton className="mb-2 h-5 w-full" />
+          <Skeleton className="h-3 w-24" />
+        </div>
+      ))}
+    </div>
+  )
+}
+
+export function SkeletonPdfReader() {
+  return (
+    <div className="flex h-full flex-col">
+      <Skeleton className="h-10 w-full shrink-0" />
+      <Skeleton className="m-4 flex-1 rounded-xl" />
+    </div>
+  )
+}
+
 export function SkeletonTable({ rows = 5 }: { rows?: number }) {
   return (
     <div className="space-y-3">

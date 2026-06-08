@@ -11,7 +11,7 @@ import { useLogin } from "@/modules/auth/hooks/useAuth";
 
 function SignInForm() {
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") ?? "/dashboard";
+  const callbackUrl = searchParams.get("callbackUrl") ?? "/workspace";
   const oauthError = searchParams.get("error");
 
   const [email, setEmail] = useState("");
@@ -39,7 +39,7 @@ function SignInForm() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-2 text-center">
-        <h1 className="text-2xl font-bold tracking-tight">Sign in</h1>
+        <h1 className="font-heading text-2xl font-bold tracking-tight">Sign in</h1>
         <p className="text-sm text-muted-foreground">
           Use your Papyrus account to continue.
         </p>

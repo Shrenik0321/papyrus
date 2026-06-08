@@ -20,8 +20,7 @@ export const OAUTH_ROUTES = {
 export const FORBIDDEN_ROUTE = "/forbidden" as const;
 
 export const appRoutes: AppRoute[] = [
-  { route: "/dashboard", isProtected: true },
-  { route: "/users", isProtected: true },
+  { route: "/workspace", isProtected: true },
   { route: "/sign-in", isProtected: false },
   { route: "/sign-up", isProtected: false },
   { route: FORBIDDEN_ROUTE, isProtected: false },

@@ -1,19 +1,20 @@
 import type { Metadata } from "next";
-import { JetBrains_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
+import { GeistSans } from "geist/font/sans";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/theme-provider";
 import { QueryProvider } from "@/providers/QueryProvider";
 import { AppToaster } from "@/components/app-toaster";
 
-const jetbrainsMono = JetBrains_Mono({
+const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-jetbrains-mono",
+  variable: "--font-inter",
 });
 
 export const metadata: Metadata = {
   title: "Papyrus",
-  description: "Papyrus Admin Dashboard",
+  description: "AI-native Research Operating System",
 };
 
 export default function RootLayout({
@@ -24,7 +25,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={cn("h-full", "antialiased", jetbrainsMono.variable)}
+      className={cn("h-full", "antialiased", GeistSans.variable, inter.variable)}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col font-sans">
