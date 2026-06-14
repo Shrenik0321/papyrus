@@ -5,12 +5,7 @@ import type {
   UpdateUserInput,
   User,
 } from "../types/user.type";
-
-function assertValidId(id: string): void {
-  if (!id.trim()) {
-    throw new Error("Invalid user id");
-  }
-}
+import { assertValidId } from "@/lib/utils";
 
 export async function getUsers(): Promise<User[]> {
   const response = await userApi.fetchUsers();

@@ -23,6 +23,10 @@ const PINNED_TABS: WorkspaceTab[] = [
   { id: "library", type: "library", title: "Library", closable: false },
 ];
 
+const HOME_ONLY_TABS: WorkspaceTab[] = [
+  { id: "home", type: "home", title: "Home", closable: false },
+];
+
 function generateTabId(): string {
   return `tab-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 }
@@ -38,10 +42,10 @@ interface WorkspaceState {
   drawerOpen: boolean;
   sidebarMobileOpen: boolean;
   drawerMobileOpen: boolean;
-  createMenuOpen: boolean;
   openTab: (tab: Omit<WorkspaceTab, "id"> & { id?: string }) => void;
   closeTab: (tabId: string) => void;
   setActiveTab: (tabId: string) => void;
+  resetWorkspaceUiForRoute: (workspaceId: string | null) => void;
   toggleSidebar: () => void;
   setSidebarCollapsed: (collapsed: boolean) => void;
   toggleDrawer: () => void;
@@ -52,8 +56,6 @@ interface WorkspaceState {
   openPaperTab: (paper: { id: string; title: string }) => void;
   openNoteTab: (note: { id: string; title: string }) => void;
   openNoveltyTab: () => void;
-  toggleCreateMenu: () => void;
-  setCreateMenuOpen: (open: boolean) => void;
   addNewTab: () => void;
 }
 
@@ -64,7 +66,6 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
   drawerOpen: true,
   sidebarMobileOpen: false,
   drawerMobileOpen: false,
-  createMenuOpen: false,
 
   openTab: (tab) => {
     const id = tab.id ?? generateTabId();
@@ -108,6 +109,23 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
   },
 
   setActiveTab: (tabId) => set({ activeTabId: tabId }),
+
+  resetWorkspaceUiForRoute: (workspaceId) => {
+    if (workspaceId === null) {
+      set({
+        tabs: HOME_ONLY_TABS,
+        activeTabId: "home",
+        drawerOpen: false,
+        drawerMobileOpen: false,
+      });
+      return;
+    }
+
+    set({
+      tabs: PINNED_TABS,
+      activeTabId: "home",
+    });
+  },
 
   toggleSidebar: () =>
     set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),
@@ -180,11 +198,6 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
       meta: { noteId: note.id },
     });
   },
-
-  toggleCreateMenu: () =>
-    set((state) => ({ createMenuOpen: !state.createMenuOpen })),
-
-  setCreateMenuOpen: (open) => set({ createMenuOpen: open }),
 
   openNoveltyTab: () => {
     const existing = get().tabs.find((t) => t.type === "novelty");

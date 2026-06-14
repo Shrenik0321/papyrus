@@ -7,6 +7,8 @@ import { DatabaseModule } from './database/database.module';
 import { getDatabaseConfig } from './database/index';
 import { OauthModule } from './modules/oauth/oauth.module';
 import { UserModule } from './modules/user/user.module';
+import { LibraryModule } from './modules/library/library.module';
+import { WorkspaceModule } from './modules/workspace/workspace.module';
 
 @Module({
   imports: [
@@ -18,6 +20,8 @@ import { UserModule } from './modules/user/user.module';
     OauthModule,
     DatabaseModule,
     UserModule,
+    WorkspaceModule,
+    LibraryModule,
   ],
   controllers: [AppController],
   providers: [AppService],

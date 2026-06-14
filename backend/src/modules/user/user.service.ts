@@ -35,7 +35,9 @@ export class UserService {
   async findAll(): Promise<Response<UserResponseDto[]>> {
     const userList = await this.userRepository.findAll();
 
-    const responseData : UserResponseDto[] = userList.map((u) => this.toResponseDto(u));
+    const responseData: UserResponseDto[] = userList.map((u) =>
+      this.toResponseDto(u),
+    );
 
     return ApiResponse(responseData, USER_API_MESSAGES.getAll);
   }
@@ -47,7 +49,7 @@ export class UserService {
       throw new NotFoundException(`User #${id} not found`);
     }
 
-    const responseData : UserResponseDto = this.toResponseDto(user);
+    const responseData: UserResponseDto = this.toResponseDto(user);
     return ApiResponse(responseData, USER_API_MESSAGES.getOne);
   }
 
@@ -78,7 +80,7 @@ export class UserService {
       throw new NotFoundException('User was created but not found');
     }
 
-    const responseData : UserResponseDto = this.toResponseDto(user);
+    const responseData: UserResponseDto = this.toResponseDto(user);
 
     return ApiResponse(responseData, USER_API_MESSAGES.create);
   }
@@ -97,7 +99,7 @@ export class UserService {
 
     const saved = await this.userRepository.save(user);
 
-    const responseData : UserResponseDto = this.toResponseDto(saved);
+    const responseData: UserResponseDto = this.toResponseDto(saved);
 
     return ApiResponse(responseData, USER_API_MESSAGES.replace);
   }
@@ -115,7 +117,7 @@ export class UserService {
     Object.assign(user, updateUserDto);
     const saved = await this.userRepository.save(user);
 
-    const responseData : UserResponseDto = this.toResponseDto(saved);
+    const responseData: UserResponseDto = this.toResponseDto(saved);
 
     return ApiResponse(responseData, USER_API_MESSAGES.update);
   }
@@ -127,7 +129,7 @@ export class UserService {
       throw new NotFoundException(`User #${id} not found`);
     }
 
-    const responseData : null = null;
+    const responseData: null = null;
 
     return ApiResponse(responseData, USER_API_MESSAGES.delete);
   }

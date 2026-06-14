@@ -29,7 +29,7 @@ const defaults: Record<403 | 404, { title: string; description: string }> = {
   },
 };
 
-function goBackWithReload(fallbackHref = "/workspace") {
+function goBackWithReload(fallbackHref = "/") {
   const referrer = document.referrer;
   if (referrer) {
     try {

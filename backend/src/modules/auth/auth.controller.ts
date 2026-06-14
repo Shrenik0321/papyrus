@@ -18,9 +18,9 @@ import type { Request, Response } from 'express';
 import { fromNodeHeaders } from 'better-auth/node';
 import { auth } from '../../lib/auth/utils';
 import {
-  AuthUserEnvelopeDto,
+  envelopeSchema,
   MessageEnvelopeDto,
-} from '../../common/swagger/api-envelope.dto';
+} from '../../lib/swagger/api-envelope.dto';
 import { AuthService } from './auth.service';
 import { AUTH_API_MESSAGES } from './utils';
 import { LoginDto } from './dto/login.dto';
@@ -43,7 +43,17 @@ export class AuthController {
       'For Swagger UI: execute this first, then call User routes (cookies) or Authorize with Bearer using the authToken JWT value.',
   })
   @ApiBody({ type: LoginDto })
-  @ApiOkResponse({ type: AuthUserEnvelopeDto })
+  @ApiOkResponse(
+    envelopeSchema(
+      {
+        type: 'object',
+        properties: {
+          user: { type: 'object', additionalProperties: true },
+        },
+      },
+      'Signed in',
+    ),
+  )
   @ApiUnauthorizedResponse({ description: 'Invalid email or password' })
   async login(
     @Body() body: LoginDto,
@@ -78,7 +88,17 @@ export class AuthController {
       'On success, sets authToken and refreshToken HTTP-only cookies on the response.',
   })
   @ApiBody({ type: RegisterDto })
-  @ApiOkResponse({ type: AuthUserEnvelopeDto })
+  @ApiOkResponse(
+    envelopeSchema(
+      {
+        type: 'object',
+        properties: {
+          user: { type: 'object', additionalProperties: true },
+        },
+      },
+      'Account created',
+    ),
+  )
   @ApiUnauthorizedResponse({ description: 'Registration failed' })
   async register(
     @Body() body: RegisterDto,

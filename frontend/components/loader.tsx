@@ -25,19 +25,6 @@ export function SkeletonCard() {
   )
 }
 
-export function SkeletonPaperCard() {
-  return (
-    <div className="rounded-xl border border-border bg-card p-4">
-      <Skeleton className="mb-3 h-5 w-3/4" />
-      <Skeleton className="mb-2 h-4 w-1/2" />
-      <div className="flex gap-2">
-        <Skeleton className="h-5 w-16 rounded-full" />
-        <Skeleton className="h-5 w-20 rounded-full" />
-      </div>
-    </div>
-  )
-}
-
 export function SkeletonActivityGrid({ count = 3 }: { count?: number }) {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

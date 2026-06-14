@@ -11,7 +11,7 @@ import { useLogin } from "@/modules/auth/hooks/useAuth";
 
 function SignInForm() {
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") ?? "/workspace";
+  const callbackUrl = searchParams.get("callbackUrl") ?? "/";
   const oauthError = searchParams.get("error");
 
   const [email, setEmail] = useState("");

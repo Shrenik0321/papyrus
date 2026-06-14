@@ -1,12 +1,18 @@
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
 import { API_URL } from "./constants";
 import { QueryClient } from "@tanstack/react-query";
-import { ApiErrorBody, ApiRequestError, ApiResponse, formatApiErrorMessage, RequestOptions } from "./types";
+import {
+  ApiErrorBody,
+  ApiRequestError,
+  ApiResponse,
+  formatApiErrorMessage,
+  RequestOptions,
+} from "./types";
 import { refresh as refreshAuthTokens } from "@/modules/auth/api/auth.api";
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
 
 // API Client
@@ -80,7 +86,10 @@ export function apiPost<T>(
   return request<T>(path, { method: "POST", body });
 }
 
-export function apiPut<T>(path: string, body: unknown): Promise<ApiResponse<T>> {
+export function apiPut<T>(
+  path: string,
+  body: unknown,
+): Promise<ApiResponse<T>> {
   return request<T>(path, { method: "PUT", body });
 }
 
@@ -106,4 +115,10 @@ export function makeQueryClient(): QueryClient {
       },
     },
   });
+}
+
+export function assertValidId(id: string): void {
+  if (!id.trim()) {
+    throw new Error("Invalid user id");
+  }
 }

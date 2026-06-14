@@ -55,5 +55,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/workspace", "/workspace/:path*"],
+  matcher: ["/", "/workspace", "/workspace/:path*"],
 };

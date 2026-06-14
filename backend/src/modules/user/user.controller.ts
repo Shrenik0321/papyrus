@@ -14,20 +14,21 @@ import {
   ApiBearerAuth,
   ApiBody,
   ApiCookieAuth,
+  ApiExtraModels,
   ApiForbiddenResponse,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
   ApiTags,
   ApiUnauthorizedResponse,
+  getSchemaPath,
 } from '@nestjs/swagger';
 import type { Request } from 'express';
 import type { AccessTokenPayload } from '../../lib/auth/utils';
 import {
-  MessageEnvelopeDto,
-  UserEnvelopeDto,
-  UserListEnvelopeDto,
-} from '../../common/swagger/api-envelope.dto';
+  envelopeRef,
+  envelopeSchema,
+} from '../../lib/swagger/api-envelope.dto';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -39,6 +40,7 @@ import { UserResponseDto } from './dto/user-response.dto';
 import { UserService } from './user.service';
 
 @ApiTags('User')
+@ApiExtraModels(UserResponseDto)
 @ApiBearerAuth('bearer')
 @ApiCookieAuth('authToken')
 @ApiUnauthorizedResponse({
@@ -55,7 +57,7 @@ export class UserController {
 
   @Get('me')
   @ApiOperation({ summary: 'Get current authenticated user' })
-  @ApiOkResponse({ type: UserEnvelopeDto })
+  @ApiOkResponse(envelopeRef(getSchemaPath(UserResponseDto)))
   getMe(
     @Req() request: Request & { user?: AccessTokenPayload },
   ): Promise<Response<UserResponseDto>> {
@@ -64,7 +66,7 @@ export class UserController {
 
   @Get()
   @ApiOperation({ summary: 'List all users' })
-  @ApiOkResponse({ type: UserListEnvelopeDto })
+  @ApiOkResponse(envelopeRef(getSchemaPath(UserResponseDto), { isArray: true }))
   findAll(): Promise<Response<UserResponseDto[]>> {
     return this.userService.findAll();
   }
@@ -72,7 +74,7 @@ export class UserController {
   @Get(':id')
   @ApiOperation({ summary: 'Get user by ID' })
   @ApiParam({ name: 'id', description: 'User UUID' })
-  @ApiOkResponse({ type: UserEnvelopeDto })
+  @ApiOkResponse(envelopeRef(getSchemaPath(UserResponseDto)))
   findById(@Param('id') id: string): Promise<Response<UserResponseDto>> {
     return this.userService.findById(id);
   }
@@ -84,7 +86,7 @@ export class UserController {
     description: 'Requires role admin.',
   })
   @ApiBody({ type: CreateUserDto })
-  @ApiOkResponse({ type: UserEnvelopeDto })
+  @ApiOkResponse(envelopeRef(getSchemaPath(UserResponseDto)))
   @ApiForbiddenResponse({ description: 'Requires admin role' })
   create(
     @Body() createUserDto: CreateUserDto,
@@ -100,7 +102,7 @@ export class UserController {
   })
   @ApiParam({ name: 'id', description: 'User UUID' })
   @ApiBody({ type: CreateUserDto })
-  @ApiOkResponse({ type: UserEnvelopeDto })
+  @ApiOkResponse(envelopeRef(getSchemaPath(UserResponseDto)))
   @ApiForbiddenResponse({ description: 'Requires admin role' })
   replace(
     @Param('id') id: string,
@@ -117,7 +119,7 @@ export class UserController {
   })
   @ApiParam({ name: 'id', description: 'User UUID' })
   @ApiBody({ type: UpdateUserDto })
-  @ApiOkResponse({ type: UserEnvelopeDto })
+  @ApiOkResponse(envelopeRef(getSchemaPath(UserResponseDto)))
   @ApiForbiddenResponse({ description: 'Requires admin role' })
   update(
     @Param('id') id: string,
@@ -133,14 +135,7 @@ export class UserController {
     description: 'Requires role admin.',
   })
   @ApiParam({ name: 'id', description: 'User UUID' })
-  @ApiOkResponse({
-    schema: {
-      properties: {
-        data: { type: 'null', nullable: true },
-        message: { type: 'string' },
-      },
-    },
-  })
+  @ApiOkResponse(envelopeSchema({ type: 'null', nullable: true }))
   @ApiForbiddenResponse({ description: 'Requires admin role' })
   remove(@Param('id') id: string): Promise<Response<null>> {
     return this.userService.remove(id);

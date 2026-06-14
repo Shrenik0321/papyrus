@@ -25,7 +25,12 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={cn("h-full", "antialiased", GeistSans.variable, inter.variable)}
+      className={cn(
+        "h-full",
+        "antialiased",
+        GeistSans.variable,
+        inter.variable,
+      )}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col font-sans">

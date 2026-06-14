@@ -1,8 +1,12 @@
-# Fullstack template
+# Papyrus
 
-> Generated via [`npx create-genesis`](https://www.npmjs.com/package/create-genesis). Generator repo: [github.com/Shrenik0321/genesis](https://github.com/Shrenik0321/genesis).
+Research workspace app — organize papers and notes, run analyses, and manage your library. Built with **NestJS** (API) and **Next.js** (frontend) on **Postgres**.
 
-NestJS API + Next.js frontend + Postgres. **Backend and frontend are separate apps** in [`backend/`](backend/) and [`frontend/`](frontend/).
+| Layer    | Stack                                      | Location      |
+| -------- | ------------------------------------------ | ------------- |
+| API      | NestJS 11, TypeORM, Better Auth, Swagger   | [`backend/`](backend/) |
+| Frontend | Next.js, React Query, Tailwind             | [`frontend/`](frontend/) |
+| Database | Postgres 16                                | Docker Compose |
 
 | Workflow                | Backend                        | Frontend                 | Database                                                                             |
 | ----------------------- | ------------------------------ | ------------------------ | ------------------------------------------------------------------------------------ |
@@ -28,19 +32,29 @@ Use this when editing code. You get hot reload (HMR / watch) without rebuilding 
 
 ### 1. Start Postgres and bootstrap schema (Docker)
 
-From this directory (`templates/fullstack/`):
+From the repo root:
 
 ```bash
 docker compose up -d --build
 ```
 
-This starts Postgres and runs a **one-shot `bootstrap` container** that applies migrations and seeds demo users. It is safe to re-run: pending migrations apply only once, and seeds skip if the `user` table already has rows.
+This starts Postgres and runs a **one-shot `bootstrap` container** that:
+
+1. Applies the Better Auth schema
+2. Runs TypeORM migrations (user, workspace, library, etc.)
+3. Seeds demo data (users → workspaces → library items)
+
+It is safe to re-run: pending migrations apply only once, and each seeder skips when its data already exists.
 
 Or from [`backend/`](backend/): `npm run db:up` (add `--build` after backend or migration changes).
 
-Postgres: `localhost:5432` — user `postgres`, password `postgres`, database `genesis`.
+**Postgres:** `localhost:5432` — user `postgres`, password `postgres`, database `papyrus`.
 
-Check bootstrap logs: `docker compose logs bootstrap`
+Check bootstrap logs:
+
+```bash
+docker compose logs bootstrap
+```
 
 ### 2. Backend (your machine)
 
@@ -54,8 +68,17 @@ npm run start:dev
 - API: http://localhost:8000/api
 - OpenAPI (Swagger UI): http://localhost:8000/docs (dev only; set `SWAGGER_ENABLED=false` to disable)
 - `.env` uses `DATABASE_HOST=localhost` to reach the Docker database.
-- Schema and demo users are created by Docker bootstrap (step 1). After adding new migrations locally, run `npm run migrate` or `docker compose up -d --build`.
+- Schema and demo data are created by Docker bootstrap (step 1). After adding new migrations locally, run `npm run migrate` or `docker compose up -d --build`.
 - `RUN_SEEDS=false` in `.env` prevents duplicate seed attempts when starting the API locally (seeds already ran in bootstrap).
+
+**Useful backend scripts:**
+
+| Command | Purpose |
+| ------- | ------- |
+| `npm run migrate` | Run pending TypeORM migrations |
+| `npm run seed` | Run all seeders manually |
+| `npm run db:reset` | Drop DB volume, re-run migrate + seed |
+| `npm run migration:generate --name=MyMigration` | Generate a migration from entity changes |
 
 ### 3. Frontend (your machine)
 
@@ -67,7 +90,7 @@ npm run dev
 ```
 
 - App: http://localhost:3000
-- `.env.local` sets `NEXT_PUBLIC_API_URL` (proxied to Nest via `next.config` rewrites).
+- `.env.local` sets `API_ORIGIN` (proxied to Nest via `next.config` rewrites).
 
 ### Authentication (Better Auth + hybrid JWT)
 
@@ -85,6 +108,8 @@ Email sign-up and sign-in use [Better Auth](https://www.better-auth.com/) on the
 - **Refresh:** `POST /api/auth/refresh` (rotates refresh token; called automatically by the frontend on 401).
 - **Logout:** `POST /api/auth/logout` (revokes refresh row + clears cookies).
 
+**Setup:**
+
 1. Set `BETTER_AUTH_SECRET` and `JWT_ACCESS_SECRET` in `backend/.env` (32+ chars). Example: `openssl rand -base64 32`
 2. Set `BETTER_AUTH_URL=http://localhost:3000`, `CORS_ORIGIN=http://localhost:3000` (public app URL, not the Nest port), optional `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET`, and optional `JWT_ACCESS_TTL` / `JWT_REFRESH_TTL` (see `backend/.env.example`).
 3. For Google sign-in, add redirect URI `http://localhost:3000/api/oauth/callback/google` in Google Cloud Console.
@@ -93,20 +118,41 @@ Email sign-up and sign-in use [Better Auth](https://www.better-auth.com/) on the
 
 **Demo accounts** (after bootstrap seeds):
 
-| Email                 | Password      |
-| --------------------- | ------------- |
-| `admin@genesis.io` | `Admin123!@#` |
-| `alice@example.com`   | `Alice123!@#` |
-| `bob@example.com`     | `Bob123!@#`   |
+| Email                     | Password   | Role  |
+| ------------------------- | ---------- | ----- |
+| `s.shrenikdeep@gmail.com` | `test@123` | Admin |
+| `alice@example.com`       | `test@456` | User  |
 
-**Reset DB after auth schema changes:** `docker compose down -v && docker compose up -d --build` from this directory.
+**Demo data** (after bootstrap seeds):
+
+| Seeder    | What it creates |
+| --------- | --------------- |
+| Users     | Two accounts (admin + user) |
+| Workspaces | `Personal Notes`, `Project Alpha` |
+| Library   | Note "AML Literature Review" in Personal Notes; paper "Attention Is All You Need" in Project Alpha |
+
+**Reset DB:** `docker compose down -v && docker compose up -d --build` from the repo root.
 
 ### Stop development
 
 - Ctrl+C in the backend and frontend terminals
-- From `templates/fullstack/`: `docker compose down`
+- From repo root: `docker compose down`
 - Or from `backend/`: `npm run db:down`
-- Reset database volume (re-run migrate + seed): `docker compose down -v && docker compose up -d --build` (from fullstack), or `npm run db:reset` (from backend)
+- Reset database volume (re-run migrate + seed): `docker compose down -v && docker compose up -d --build`, or `npm run db:reset` from `backend/`
+
+---
+
+## Backend modules
+
+| Module      | Route prefix | Description |
+| ----------- | ------------ | ----------- |
+| `auth`      | `/api/auth`  | Login, register, refresh, logout |
+| `oauth`     | `/api/oauth` | Google OAuth |
+| `user`      | `/api/user`  | User CRUD, `GET /me` |
+| `workspace` | `/api/workspace` | List workspaces for the authenticated user |
+| `library`   | —            | Entity + repository (API routes coming) |
+
+Database entities: `user`, `workspace`, `library` (polymorphic `note` / `paper` items scoped to a workspace), `refresh_session`.
 
 ---
 
@@ -120,7 +166,7 @@ Stop the dev database first if it is using port `5432`:
 docker compose down
 ```
 
-From `templates/fullstack/`:
+From the repo root:
 
 ```bash
 cp backend/.env.example backend/.env   # if you have not already
@@ -165,10 +211,10 @@ Run migrations once per release (entrypoint can run them when `RUN_MIGRATIONS=tr
 
 | Issue                                         | Fix                                                                                                                                                          |
 | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Port `5432`, `8000`, or `3000` already in use | Stop dev DB (`docker compose down` from fullstack) before prod preview; stop local dev servers before prod preview; check `docker ps`                        |
-| API cannot connect to DB in dev               | Ensure Postgres is running (`docker compose up -d --build` from fullstack) and `backend/.env` has `DATABASE_HOST=localhost`                                  |
+| Port `5432`, `8000`, or `3000` already in use | Stop dev DB (`docker compose down`) before prod preview; stop local dev servers before prod preview; check `docker ps`                                       |
+| API cannot connect to DB in dev               | Ensure Postgres is running (`docker compose up -d --build`) and `backend/.env` has `DATABASE_HOST=localhost`                                                 |
 | Bootstrap failed or schema missing            | `docker compose logs bootstrap` — rebuild with `--build` after migration changes                                                                             |
-| Frontend cannot reach API                     | Check `frontend/.env.local` has `NEXT_PUBLIC_API_URL=http://localhost:8000/api`                                                                              |
-| Sign-in fails / 401 on API                    | Ensure `BETTER_AUTH_SECRET` and `BETTER_AUTH_URL` are set in `backend/.env`; reset DB if migrating from the old demo `user` table (`docker compose down -v`) |
+| Frontend cannot reach API                     | Check `frontend/.env.local` has `API_ORIGIN=http://localhost:8000`                                                                                           |
+| Sign-in fails / 401 on API                    | Ensure `BETTER_AUTH_SECRET`, `JWT_ACCESS_SECRET`, and `BETTER_AUTH_URL` are set in `backend/.env`; reset DB if schema is stale (`docker compose down -v`)      |
 | Session cookie not sent                       | API must send `CORS_ORIGIN` with `credentials: true` (configured in `main.ts`); frontend uses same-origin `/api` rewrites                                    |
 | UI changes not visible in Docker              | Expected — use **Local development** (`npm run dev`), not production preview                                                                                 |

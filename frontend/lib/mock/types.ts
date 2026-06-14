@@ -52,21 +52,3 @@ export interface NoveltyResult {
   risksAndChallenges: string[];
   reasoning: string[];
 }
-
-export interface LinkedKnowledge {
-  noteId: string;
-  linkedItems: { type: string; title: string; refId?: string }[];
-  connectedPapers: { id: string; title: string }[];
-  relatedNotes: { id: string; title: string }[];
-  researchQuestions: string[];
-  researchIdeas: string[];
-}
-
-export interface Recommendation {
-  id: string;
-  type: "paper" | "note" | "action";
-  title: string;
-  description: string;
-  refId?: string;
-  action?: string;
-}

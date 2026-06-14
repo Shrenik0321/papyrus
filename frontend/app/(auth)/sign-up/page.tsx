@@ -28,7 +28,7 @@ export default function SignUpPage() {
       return;
     }
 
-    window.location.assign("/workspace");
+    window.location.assign("/");
   };
 
   return (
@@ -40,7 +40,7 @@ export default function SignUpPage() {
         </p>
       </div>
 
-      <GoogleSignInButton callbackUrl="/workspace" />
+      <GoogleSignInButton callbackUrl="/" />
 
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
