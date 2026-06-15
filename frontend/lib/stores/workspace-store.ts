@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { workspaceTabStateEqual } from "@/lib/workspace-url";
 
 export type TabType =
   | "home"
@@ -45,6 +46,7 @@ interface WorkspaceState {
   openTab: (tab: Omit<WorkspaceTab, "id"> & { id?: string }) => void;
   closeTab: (tabId: string) => void;
   setActiveTab: (tabId: string) => void;
+  hydrateWorkspaceTabs: (tabs: WorkspaceTab[], activeTabId: string) => void;
   resetWorkspaceUiForRoute: (workspaceId: string | null) => void;
   toggleSidebar: () => void;
   setSidebarCollapsed: (collapsed: boolean) => void;
@@ -56,7 +58,6 @@ interface WorkspaceState {
   openPaperTab: (paper: { id: string; title: string }) => void;
   openNoteTab: (note: { id: string; title: string }) => void;
   openNoveltyTab: () => void;
-  addNewTab: () => void;
 }
 
 export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
@@ -110,20 +111,28 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
 
   setActiveTab: (tabId) => set({ activeTabId: tabId }),
 
+  hydrateWorkspaceTabs: (tabs, activeTabId) => {
+    const { tabs: currentTabs, activeTabId: currentActiveTabId } = get();
+    const nextState = { tabs, activeTabId };
+    const currentState = { tabs: currentTabs, activeTabId: currentActiveTabId };
+
+    if (workspaceTabStateEqual(nextState, currentState)) {
+      return;
+    }
+
+    set(nextState);
+  },
+
   resetWorkspaceUiForRoute: (workspaceId) => {
-    if (workspaceId === null) {
-      set({
-        tabs: HOME_ONLY_TABS,
-        activeTabId: "home",
-        drawerOpen: false,
-        drawerMobileOpen: false,
-      });
+    if (workspaceId !== null) {
       return;
     }
 
     set({
-      tabs: PINNED_TABS,
+      tabs: HOME_ONLY_TABS,
       activeTabId: "home",
+      drawerOpen: false,
+      drawerMobileOpen: false,
     });
   },
 
@@ -169,7 +178,8 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
 
   openPaperTab: (paper) => {
     const existing = get().tabs.find(
-      (t) => t.type === "paper" && t.meta?.paperId === paper.id,
+      (t) =>
+        t.type === "paper" && t.meta?.libraryItemId === paper.id,
     );
     if (existing) {
       set({ activeTabId: existing.id });
@@ -179,13 +189,13 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
       type: "paper",
       title: truncateTitle(paper.title),
       closable: true,
-      meta: { paperId: paper.id },
+      meta: { libraryItemId: paper.id },
     });
   },
 
   openNoteTab: (note) => {
     const existing = get().tabs.find(
-      (t) => t.type === "note" && t.meta?.noteId === note.id,
+      (t) => t.type === "note" && t.meta?.libraryItemId === note.id,
     );
     if (existing) {
       set({ activeTabId: existing.id });
@@ -195,7 +205,7 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
       type: "note",
       title: truncateTitle(note.title),
       closable: true,
-      meta: { noteId: note.id },
+      meta: { libraryItemId: note.id },
     });
   },
 
@@ -209,15 +219,6 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
       type: "novelty",
       title: "Novelty Analysis",
       closable: true,
-    });
-  },
-
-  addNewTab: () => {
-    get().openTab({
-      type: "note",
-      title: "New Note",
-      closable: true,
-      meta: { noteId: "note-4" },
     });
   },
 }));

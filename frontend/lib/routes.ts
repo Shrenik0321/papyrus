@@ -32,4 +32,18 @@ export const OAUTH_ROUTES = {
 export const WORKSPACE_ROUTES = {
   base: "/workspace",
   byId: (id: string) => `/workspace/${id}`,
+  byIdWithTabs: (id: string, tabs: string, active: string) =>
+    `/workspace/${id}?tabs=${encodeURIComponent(tabs)}&active=${encodeURIComponent(active)}`,
+};
+
+export const LIBRARY_ROUTES = {
+  byWorkspace: (workspaceId: string) => `/library/workspace/${workspaceId}`,
+  create: () => `/library`,
+  byId: (id: string) => `/library/${id}`,
+  content: (id: string) => `/library/${id}/content`,
+};
+
+export const FILE_ROUTES = {
+  upload: "/files/upload",
+  delete: "/files",
 };

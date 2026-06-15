@@ -9,6 +9,7 @@ import { OauthModule } from './modules/oauth/oauth.module';
 import { UserModule } from './modules/user/user.module';
 import { LibraryModule } from './modules/library/library.module';
 import { WorkspaceModule } from './modules/workspace/workspace.module';
+import { FileStorageModule } from './modules/file-storage/file-storage.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { WorkspaceModule } from './modules/workspace/workspace.module';
     DatabaseModule,
     UserModule,
     WorkspaceModule,
+    FileStorageModule,
     LibraryModule,
   ],
   controllers: [AppController],

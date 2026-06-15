@@ -11,6 +11,7 @@ import {
 import { useBreakpoint } from "@/lib/use-breakpoint";
 import { cn } from "@/lib/utils";
 import { useActiveWorkspace, useActiveWorkspaceId } from "@/modules/workspace/hooks/useWorkspace";
+import { useLibraryUploadActions } from "@/modules/library/hooks/useLibraryUploadActions";
 import {
   FileTextIcon,
   HomeIcon,
@@ -150,7 +151,8 @@ function TabStrip() {
   const activeTabId = useWorkspaceStore((s) => s.activeTabId);
   const setActiveTab = useWorkspaceStore((s) => s.setActiveTab);
   const closeTab = useWorkspaceStore((s) => s.closeTab);
-  const addNewTab = useWorkspaceStore((s) => s.addNewTab);
+  const workspaceId = useActiveWorkspaceId() ?? "";
+  const { handleCreateNote, isPending } = useLibraryUploadActions(workspaceId);
 
   return (
     <div className="flex h-10 shrink-0 items-end border-b border-border bg-card/80">
@@ -167,11 +169,16 @@ function TabStrip() {
           ))}
           <button
             type="button"
-            onClick={addNewTab}
-            className="mb-0.5 flex size-7 shrink-0 items-center justify-center rounded-[8px] text-muted-foreground transition-colors duration-150 hover:bg-muted/80 hover:text-foreground"
+            onClick={() => void handleCreateNote()}
+            disabled={!workspaceId || isPending}
+            className="mb-0.5 flex size-7 shrink-0 items-center justify-center rounded-[8px] text-muted-foreground transition-colors duration-150 hover:bg-muted/80 hover:text-foreground disabled:pointer-events-none disabled:opacity-50"
             aria-label="New tab"
           >
-            <PlusIcon className="size-4" />
+            {isPending ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <PlusIcon className="size-4" />
+            )}
           </button>
         </div>
         <ScrollBar orientation="horizontal" className="h-1.5" />

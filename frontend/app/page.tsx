@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
+import { PapyrusShell } from "@/components/papyrus-shell/index";
 
 export default function Home() {
-  redirect("/");
+  return <PapyrusShell />;
 }

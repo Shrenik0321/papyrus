@@ -8,7 +8,8 @@ import { SkeletonPdfReader } from "@/components/loader";
 import { HighlightMenu } from "../shared/highlight-menu";
 import { InsightModal } from "../shared/insight-modal";
 import { useActiveTab } from "@/lib/stores/workspace-store";
-import { usePaper } from "@/modules/research/hooks/usePapers";
+import { useLibraryItem } from "@/modules/library/hooks/useLibrary";
+import { useActiveWorkspaceId } from "@/modules/workspace/hooks/useWorkspace";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -22,8 +23,9 @@ const Page = dynamic(() => import("react-pdf").then((mod) => mod.Page), {
 
 export function PaperTab() {
   const activeTab = useActiveTab();
-  const paperId = activeTab?.meta?.paperId as string | undefined;
-  const { data: paper, isLoading } = usePaper(paperId);
+  const workspaceId = useActiveWorkspaceId() ?? "";
+  const libraryItemId = activeTab?.meta?.libraryItemId as string | undefined;
+  const { data: item, isLoading } = useLibraryItem(workspaceId, libraryItemId);
 
   const [numPages, setNumPages] = React.useState<number>(0);
   const [pageNumber, setPageNumber] = React.useState(1);
@@ -43,6 +45,11 @@ export function PaperTab() {
       setPdfReady(true);
     });
   }, []);
+
+  React.useEffect(() => {
+    setPageNumber(1);
+    setNumPages(0);
+  }, [libraryItemId]);
 
   React.useEffect(() => {
     const handleMouseUp = () => {
@@ -71,7 +78,7 @@ export function PaperTab() {
     return <SkeletonPdfReader />;
   }
 
-  if (!paper) {
+  if (!item) {
     return (
       <div className="flex h-full items-center justify-center text-muted-foreground">
         Paper not found
@@ -79,10 +86,18 @@ export function PaperTab() {
     );
   }
 
+  if (item.type !== "paper") {
+    return (
+      <div className="flex h-full items-center justify-center text-muted-foreground">
+        This library item is not a paper
+      </div>
+    );
+  }
+
   return (
     <div className="flex h-full flex-col bg-background">
       <div className="flex h-10 shrink-0 items-center justify-between border-b border-border px-4">
-        <span className="truncate text-sm font-medium">{paper.title}</span>
+        <span className="truncate text-sm font-medium">{item.title}</span>
         <div className="flex items-center gap-1">
           <Button
             variant="ghost"
@@ -111,7 +126,7 @@ export function PaperTab() {
         className="flex flex-1 justify-center overflow-auto bg-muted/20 p-6"
       >
         <Document
-          file={paper.pdfUrl}
+          file={item.fileUrl}
           onLoadSuccess={({ numPages: n }) => setNumPages(n)}
           loading={<SkeletonPdfReader />}
           className="shadow-sm"

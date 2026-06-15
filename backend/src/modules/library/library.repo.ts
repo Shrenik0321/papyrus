@@ -32,7 +32,7 @@ export class LibraryRepository {
     return this.repository.findOne({ where: { id } });
   }
 
-  save(library: Library): Promise<Library> {
+  save(library: Partial<Library>): Promise<Library> {
     return this.repository.save(library);
   }
 

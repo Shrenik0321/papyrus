@@ -18,3 +18,11 @@ export type AddLibraryItemInput = {
   type?: LibraryType;
   title?: string;
 };
+
+export type LibraryContent = {
+  content: string;
+};
+
+export type UpdateLibraryContentInput = {
+  content: string;
+};

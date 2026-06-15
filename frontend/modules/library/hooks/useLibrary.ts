@@ -6,13 +6,17 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import * as libraryService from "../services/library.service";
-import type { AddLibraryItemInput } from "../types/library.type";
+import type {
+  AddLibraryItemInput,
+  UpdateLibraryContentInput,
+} from "../types/library.type";
 
 export const libraryKeys = {
   all: ["library"] as const,
   lists: () => [...libraryKeys.all, "list"] as const,
   byWorkspace: (workspaceId: string) =>
     [...libraryKeys.lists(), workspaceId] as const,
+  content: (id: string) => [...libraryKeys.all, "content", id] as const,
 };
 
 export function useLibrary(workspaceId: string) {
@@ -60,6 +64,40 @@ export function useDeleteLibraryItem() {
       workspaceId: string;
     }) => libraryService.deleteLibraryItem(id),
     onSuccess: (_data, { workspaceId }) => {
+      queryClient.invalidateQueries({
+        queryKey: libraryKeys.byWorkspace(workspaceId),
+      });
+    },
+  });
+}
+
+export function useLibraryContent(libraryItemId: string | undefined) {
+  return useQuery({
+    queryKey: libraryKeys.content(libraryItemId ?? ""),
+    queryFn: () => libraryService.getLibraryContent(libraryItemId!),
+    enabled: Boolean(libraryItemId),
+  });
+}
+
+export function useUpdateLibraryContent() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      id,
+      content,
+    }: {
+      id: string;
+      workspaceId: string;
+      content: string;
+    }) =>
+      libraryService.updateLibraryContent(id, {
+        content,
+      } satisfies UpdateLibraryContentInput),
+    onSuccess: (_data, { id, workspaceId }) => {
+      queryClient.invalidateQueries({
+        queryKey: libraryKeys.content(id),
+      });
       queryClient.invalidateQueries({
         queryKey: libraryKeys.byWorkspace(workspaceId),
       });
