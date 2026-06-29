@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import { MOCK_CHATS, type ChatSession } from "@/lib/mock/chats";
 
 export interface OpenChatTab {
   id: string;
@@ -15,17 +14,15 @@ function truncateTitle(title: string, max = 24): string {
 }
 
 interface ChatState {
-  sessions: ChatSession[];
   openTabs: OpenChatTab[];
   activeTabId: string | null;
   openChat: (chat: { id: string; title: string }) => void;
   closeChatTab: (tabId: string) => void;
   setActiveChatTab: (tabId: string) => void;
-  createNewChat: () => void;
+  reset: () => void;
 }
 
 export const useChatStore = create<ChatState>((set, get) => ({
-  sessions: MOCK_CHATS,
   openTabs: [],
   activeTabId: null,
 
@@ -44,21 +41,6 @@ export const useChatStore = create<ChatState>((set, get) => ({
       ],
       activeTabId: chat.id,
     }));
-
-    const sessionExists = get().sessions.some((s) => s.id === chat.id);
-    if (!sessionExists) {
-      set((state) => ({
-        sessions: [
-          {
-            id: chat.id,
-            title: chat.title,
-            lastMessageAt: new Date().toISOString(),
-            messages: [],
-          },
-          ...state.sessions,
-        ],
-      }));
-    }
   },
 
   closeChatTab: (tabId) => {
@@ -77,14 +59,5 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
   setActiveChatTab: (tabId) => set({ activeTabId: tabId }),
 
-  createNewChat: () => {
-    const id = generateChatId();
-    get().openChat({ id, title: "New chat" });
-  },
+  reset: () => set({ openTabs: [], activeTabId: null }),
 }));
-
-export function useActiveChatSession(): ChatSession | undefined {
-  const activeTabId = useChatStore((s) => s.activeTabId);
-  const sessions = useChatStore((s) => s.sessions);
-  return sessions.find((s) => s.id === activeTabId);
-}

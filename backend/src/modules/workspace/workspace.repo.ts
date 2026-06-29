@@ -21,7 +21,7 @@ export class WorkspaceRepository {
     return this.repository.findOne({ where: { id } });
   }
 
-  save(workspace: Workspace): Promise<Workspace> {
+  save(workspace: Partial<Workspace>): Promise<Workspace> {
     return this.repository.save(workspace);
   }
 

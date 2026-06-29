@@ -24,6 +24,7 @@ import {
   PanelRightOpenIcon,
   PlusIcon,
   SearchIcon,
+  SettingsIcon,
   SparklesIcon,
   StickyNoteIcon,
   XIcon,
@@ -39,6 +40,7 @@ const TAB_ICONS: Record<TabType, LucideIcon> = {
   chat: MessageSquareIcon,
   novelty: SparklesIcon,
   plan: ListTodoIcon,
+  settings: SettingsIcon,
 };
 
 function TabItem({
@@ -194,8 +196,11 @@ export function TabBar() {
   const setSidebarMobileOpen = useWorkspaceStore((s) => s.setSidebarMobileOpen);
   const activeWorkspaceId = useActiveWorkspaceId();
   const { isLoading } = useActiveWorkspace();
+  const tabs = useWorkspaceStore((s) => s.tabs);
 
   const hasWorkspace = Boolean(activeWorkspaceId);
+  const showTabStrip =
+    hasWorkspace || tabs.some((tab) => tab.type === "settings");
 
   if (isLoading) {
     return (
@@ -221,7 +226,7 @@ export function TabBar() {
         </div>
       )}
 
-      {hasWorkspace && <TabStrip />}
+      {showTabStrip && <TabStrip />}
 
       <main className="min-h-0 flex-1 overflow-auto bg-background">
         <TabContent />

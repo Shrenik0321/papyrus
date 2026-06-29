@@ -47,3 +47,14 @@ export const FILE_ROUTES = {
   upload: "/files/upload",
   delete: "/files",
 };
+
+export const CHAT_ROUTES = {
+  byWorkspace: (workspaceId: string) => `/chat/workspace/${workspaceId}`,
+  byId: (sessionId: string) => `/chat/${sessionId}`,
+  messages: (sessionId: string) => `/chat/${sessionId}/messages`,
+};
+
+export const SETTINGS_ROUTES = {
+  base: "/settings",
+  byProperty: (property: string) => `/settings/${property}`,
+};

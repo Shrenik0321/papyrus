@@ -46,6 +46,7 @@ function SidebarPanel({
   const activeTabId = useWorkspaceStore((s) => s.activeTabId);
   const tabs = useWorkspaceStore((s) => s.tabs);
   const openNavTab = useWorkspaceStore((s) => s.openNavTab);
+  const openSettingsTab = useWorkspaceStore((s) => s.openSettingsTab);
   const { selectWorkspace } = useActiveWorkspace();
 
   const activeTab = tabs.find((t) => t.id === activeTabId);
@@ -55,6 +56,7 @@ function SidebarPanel({
   const isLibraryActive =
     activeType === "library" || activeType === "paper" || activeType === "note";
   const isSearchActive = activeType === "search";
+  const isSettingsActive = activeType === "settings";
 
   const navItems = hasWorkspace
     ? [
@@ -169,7 +171,13 @@ function SidebarPanel({
             <button
               type="button"
               title="Settings"
-              className="flex w-full items-center gap-2.5 rounded-[10px] px-2.5 py-2 text-sm text-muted-foreground transition-colors duration-150 hover:bg-muted/60 hover:text-foreground"
+              onClick={() => openSettingsTab()}
+              className={cn(
+                "flex w-full items-center gap-2.5 rounded-[10px] px-2.5 py-2 text-sm transition-colors duration-150",
+                isSettingsActive
+                  ? "bg-muted font-medium text-foreground"
+                  : "text-muted-foreground hover:bg-muted/60 hover:text-foreground",
+              )}
             >
               <SettingsIcon className="size-4 shrink-0" />
               <span>Settings</span>

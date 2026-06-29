@@ -15,6 +15,7 @@ import { useBreakpoint } from "@/lib/use-breakpoint";
 import { cn } from "@/lib/utils";
 import { useActiveWorkspace } from "@/modules/workspace/hooks/useWorkspace";
 import { MessageSquareIcon, PlusIcon, SparklesIcon, XIcon } from "lucide-react";
+import { useChatActions } from "@/modules/chat/hooks/useChatActions";
 
 function ChatTabItem({
   tab,
@@ -68,12 +69,15 @@ function ChatTabItem({
   );
 }
 
-function ChatTabStrip() {
+function ChatTabStrip({
+  onNewChat,
+}: {
+  onNewChat: () => void;
+}) {
   const openTabs = useChatStore((s) => s.openTabs);
   const activeTabId = useChatStore((s) => s.activeTabId);
   const setActiveChatTab = useChatStore((s) => s.setActiveChatTab);
   const closeChatTab = useChatStore((s) => s.closeChatTab);
-  const createNewChat = useChatStore((s) => s.createNewChat);
 
   return (
     <div className="flex h-9 shrink-0 items-center border-b border-border bg-muted/30 px-2">
@@ -90,7 +94,7 @@ function ChatTabStrip() {
           ))}
           <button
             type="button"
-            onClick={createNewChat}
+            onClick={onNewChat}
             className="flex size-6 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors duration-150 hover:bg-muted/80 hover:text-foreground"
             aria-label="New chat"
           >
@@ -103,7 +107,17 @@ function ChatTabStrip() {
   );
 }
 
-function ChatBarPanel({ className }: { className?: string }) {
+function ChatBarPanel({
+  className,
+  onNewChat,
+  onSend,
+  isSending,
+}: {
+  className?: string;
+  onNewChat: () => void;
+  onSend: (content: string) => Promise<void>;
+  isSending: boolean;
+}) {
   return (
     <aside
       className={cn(
@@ -118,13 +132,13 @@ function ChatBarPanel({ className }: { className?: string }) {
         </div>
       </div>
 
-      <ChatTabStrip />
+      <ChatTabStrip onNewChat={onNewChat} />
 
       <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
         <ChatPanel />
       </div>
 
-      <AiInput />
+      <AiInput disabled={isSending} onSend={onSend} />
     </aside>
   );
 }
@@ -138,6 +152,7 @@ export function ChatBar() {
   const setDrawerMobileOpen = useWorkspaceStore((s) => s.setDrawerMobileOpen);
 
   const { activeWorkspaceId, isLoading } = useActiveWorkspace();
+  const { createNewChat, sendMessage, isSending } = useChatActions();
 
   const hasWorkspace = Boolean(activeWorkspaceId);
 
@@ -148,7 +163,14 @@ export function ChatBar() {
 
   return (
     <>
-      {showInlineDrawer && <ChatBarPanel />}
+      {showInlineDrawer && (
+        <ChatBarPanel
+          onNewChat={createNewChat}
+          onSend={sendMessage}
+          isSending={isSending}
+          className={undefined}
+        />
+      )}
 
       <Sheet
         open={showDrawerSheet}
@@ -164,7 +186,12 @@ export function ChatBar() {
           <SheetHeader className="sr-only">
             <SheetTitle>AI Assistant</SheetTitle>
           </SheetHeader>
-          <ChatBarPanel className="w-full border-0" />
+          <ChatBarPanel
+            className="w-full border-0"
+            onNewChat={createNewChat}
+            onSend={sendMessage}
+            isSending={isSending}
+          />
         </SheetContent>
       </Sheet>
     </>

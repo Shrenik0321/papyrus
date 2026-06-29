@@ -9,7 +9,8 @@ export type TabType =
   | "note"
   | "chat"
   | "novelty"
-  | "plan";
+  | "plan"
+  | "settings";
 
 export interface WorkspaceTab {
   id: string;
@@ -58,6 +59,7 @@ interface WorkspaceState {
   openPaperTab: (paper: { id: string; title: string }) => void;
   openNoteTab: (note: { id: string; title: string }) => void;
   openNoveltyTab: () => void;
+  openSettingsTab: () => void;
 }
 
 export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
@@ -220,6 +222,21 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
       title: "Novelty Analysis",
       closable: true,
     });
+  },
+
+  openSettingsTab: () => {
+    const existing = get().tabs.find((t) => t.type === "settings");
+    if (existing) {
+      set({ activeTabId: existing.id, sidebarMobileOpen: false });
+      return;
+    }
+    get().openTab({
+      id: "settings",
+      type: "settings",
+      title: "Settings",
+      closable: true,
+    });
+    set({ sidebarMobileOpen: false });
   },
 }));
 

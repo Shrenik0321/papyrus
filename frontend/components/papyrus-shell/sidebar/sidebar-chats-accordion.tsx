@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import { Separator } from "@/components/ui/separator";
-import { useChatStore } from "@/lib/stores/chat-store";
 import { useWorkspaceStore } from "@/lib/stores/workspace-store";
 import { cn } from "@/lib/utils";
 import {
@@ -11,6 +10,7 @@ import {
   PlusIcon,
 } from "lucide-react";
 import { collapsedSidebarIconClass } from "./sidebar-nav-item";
+import { useChatActions } from "@/modules/chat/hooks/useChatActions";
 
 interface SidebarChatsAccordionProps {
   collapsed?: boolean;
@@ -32,10 +32,7 @@ export function SidebarChatsAccordion({
   collapsed,
 }: SidebarChatsAccordionProps) {
   const [expanded, setExpanded] = React.useState(true);
-  const sessions = useChatStore((s) => s.sessions);
-  const activeTabId = useChatStore((s) => s.activeTabId);
-  const openChat = useChatStore((s) => s.openChat);
-  const createNewChat = useChatStore((s) => s.createNewChat);
+  const { sessions, activeTabId, selectChat, createNewChat } = useChatActions();
   const setDrawerOpen = useWorkspaceStore((s) => s.setDrawerOpen);
   const setDrawerMobileOpen = useWorkspaceStore((s) => s.setDrawerMobileOpen);
 
@@ -45,7 +42,7 @@ export function SidebarChatsAccordion({
   };
 
   const handleSelectChat = (chat: { id: string; title: string }) => {
-    openChat(chat);
+    selectChat(chat);
     openDrawer();
   };
 

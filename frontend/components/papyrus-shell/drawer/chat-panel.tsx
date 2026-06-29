@@ -1,9 +1,9 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useActiveChatSession, useChatStore } from "@/lib/stores/chat-store";
 import { cn } from "@/lib/utils";
 import { BotIcon, MessageSquarePlusIcon } from "lucide-react";
+import { useChatActions } from "@/modules/chat/hooks/useChatActions";
 
 function MessageBubble({
   role,
@@ -36,8 +36,7 @@ function MessageBubble({
 }
 
 export function ChatPanel() {
-  const activeSession = useActiveChatSession();
-  const createNewChat = useChatStore((s) => s.createNewChat);
+  const { activeSession, createNewChat } = useChatActions();
 
   if (!activeSession) {
     return (

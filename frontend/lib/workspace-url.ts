@@ -55,6 +55,15 @@ export function tokenToTab(token: string): WorkspaceTab | null {
     };
   }
 
+  if (token === "settings") {
+    return {
+      id: "settings",
+      type: "settings",
+      title: "Settings",
+      closable: true,
+    };
+  }
+
   const paperMatch = token.match(/^paper:(.+)$/);
   if (paperMatch) {
     const libraryItemId = paperMatch[1];

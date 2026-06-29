@@ -10,9 +10,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useActiveWorkspace } from "@/modules/workspace/hooks/useWorkspace";
+import {
+  useActiveWorkspace,
+  useCreateWorkspaceFlow,
+} from "@/modules/workspace/hooks/useWorkspace";
 import { ChevronsUpDownIcon, HomeIcon, LayersIcon, PlusIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { CreateWorkspaceDialog } from "./create-workspace-dialog";
 
 interface WorkspaceSwitcherProps {
   collapsed?: boolean;
@@ -25,6 +29,12 @@ export function WorkspaceSwitcher({ collapsed }: WorkspaceSwitcherProps) {
     selectWorkspace,
     isLoading,
   } = useActiveWorkspace();
+  const {
+    dialogOpen,
+    setDialogOpen,
+    handleCreateWorkspace,
+    isPending,
+  } = useCreateWorkspaceFlow();
 
   if (isLoading) {
     return (
@@ -46,7 +56,8 @@ export function WorkspaceSwitcher({ collapsed }: WorkspaceSwitcherProps) {
   }
 
   return (
-    <DropdownMenu>
+    <>
+      <DropdownMenu>
       <DropdownMenuTrigger
         className={cn(
           "flex items-center gap-2 rounded-[10px] text-left transition-colors duration-200 outline-none",
@@ -120,11 +131,25 @@ export function WorkspaceSwitcher({ collapsed }: WorkspaceSwitcherProps) {
           );
         })}
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="gap-2 text-muted-foreground">
+        <DropdownMenuItem
+          className="gap-2 text-muted-foreground"
+          onSelect={(event) => {
+            event.preventDefault();
+            setDialogOpen(true);
+          }}
+        >
           <PlusIcon className="size-4" />
           New workspace
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
+
+      <CreateWorkspaceDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        onSubmit={handleCreateWorkspace}
+        isPending={isPending}
+      />
+    </>
   );
 }

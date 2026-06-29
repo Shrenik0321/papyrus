@@ -13,3 +13,8 @@ export async function getWorkspace(id: string): Promise<Workspace> {
   const response = await workspaceApi.fetchWorkspaceById(id);
   return unwrapApiResponse(response);
 }
+
+export async function createWorkspace(title: string): Promise<Workspace> {
+  const response = await workspaceApi.createWorkspace(title);
+  return unwrapApiResponse(response);
+}

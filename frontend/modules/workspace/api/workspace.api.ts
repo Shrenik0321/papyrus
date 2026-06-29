@@ -12,3 +12,9 @@ export function fetchWorkspaceById(
 ): Promise<ApiResponse<Workspace>> {
   return apiGet<Workspace>(WORKSPACE_ROUTES.byId(id));
 }
+
+export function createWorkspace(
+  title: string,
+): Promise<ApiResponse<Workspace>> {
+  return apiPost<Workspace>(WORKSPACE_ROUTES.base, { title });
+}

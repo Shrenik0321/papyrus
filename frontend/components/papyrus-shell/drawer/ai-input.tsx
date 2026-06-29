@@ -5,10 +5,15 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { SendIcon } from "lucide-react";
-import { toast } from "sonner";
 
-export function AiInput() {
+interface AiInputProps {
+  disabled?: boolean;
+  onSend: (content: string) => Promise<void> | void;
+}
+
+export function AiInput({ disabled, onSend }: AiInputProps) {
   const [value, setValue] = React.useState("");
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
 
   const insertToken = (token: string) => {
@@ -16,10 +21,16 @@ export function AiInput() {
     textareaRef.current?.focus();
   };
 
-  const handleSubmit = () => {
-    if (!value.trim()) return;
-    toast.info("AI responses coming soon", { description: value.trim() });
-    setValue("");
+  const handleSubmit = async () => {
+    const trimmed = value.trim();
+    if (!trimmed || disabled || isSubmitting) return;
+    try {
+      setIsSubmitting(true);
+      await onSend(trimmed);
+      setValue("");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -64,7 +75,7 @@ export function AiInput() {
         <Button
           size="icon-sm"
           onClick={handleSubmit}
-          disabled={!value.trim()}
+          disabled={disabled || isSubmitting || !value.trim()}
           aria-label="Send"
         >
           <SendIcon />

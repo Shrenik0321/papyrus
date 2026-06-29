@@ -9,10 +9,15 @@ import { SearchTab } from "./tabs/search-tab";
 import { PaperTab } from "./tabs/paper-tab";
 import { NotesTab } from "./tabs/notes-tab";
 import { NoveltyTab } from "./tabs/novelty-tab";
+import { SettingsTab } from "./tabs/settings-tab";
 
 export function TabContent() {
   const activeWorkspaceId = useActiveWorkspaceId();
   const activeTab = useActiveTab();
+
+  if (activeTab?.type === "settings") {
+    return <SettingsTab />;
+  }
 
   if (!activeWorkspaceId) {
     return <GlobalHomeTab />;

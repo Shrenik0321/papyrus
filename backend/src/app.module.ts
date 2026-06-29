@@ -10,6 +10,8 @@ import { UserModule } from './modules/user/user.module';
 import { LibraryModule } from './modules/library/library.module';
 import { WorkspaceModule } from './modules/workspace/workspace.module';
 import { FileStorageModule } from './modules/file-storage/file-storage.module';
+import { ChatModule } from './modules/chat/chat.module';
+import { SettingsModule } from './modules/settings/settings.module';
 
 @Module({
   imports: [
@@ -24,6 +26,8 @@ import { FileStorageModule } from './modules/file-storage/file-storage.module';
     WorkspaceModule,
     FileStorageModule,
     LibraryModule,
+    ChatModule,
+    SettingsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

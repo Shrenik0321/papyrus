@@ -1,6 +1,10 @@
 "use client";
 
-import { useActiveWorkspace } from "@/modules/workspace/hooks/useWorkspace";
+import { CreateWorkspaceDialog } from "@/components/papyrus-shell/sidebar/create-workspace-dialog";
+import {
+  useActiveWorkspace,
+  useCreateWorkspaceFlow,
+} from "@/modules/workspace/hooks/useWorkspace";
 import { useCurrentUser } from "@/modules/users/hooks/useCurrentUser";
 import { cn } from "@/lib/utils";
 import { LayersIcon, PlusIcon } from "lucide-react";
@@ -15,6 +19,12 @@ function getGreeting(): string {
 export function GlobalHomeTab() {
   const { data: user } = useCurrentUser();
   const { workspaces, isLoading, selectWorkspace } = useActiveWorkspace();
+  const {
+    dialogOpen,
+    setDialogOpen,
+    handleCreateWorkspace,
+    isPending,
+  } = useCreateWorkspaceFlow();
 
   const firstName = user?.name?.split(" ")[0] ?? "Researcher";
 
@@ -23,7 +33,8 @@ export function GlobalHomeTab() {
   };
 
   return (
-    <div className="h-full overflow-auto">
+    <>
+      <div className="h-full overflow-auto">
       <div className="mx-auto max-w-4xl px-8 py-10">
         <div className="mb-10">
           <h1 className="font-heading text-4xl font-semibold tracking-tight">
@@ -62,6 +73,7 @@ export function GlobalHomeTab() {
               </p>
               <button
                 type="button"
+                onClick={() => setDialogOpen(true)}
                 className="mt-4 flex items-center gap-2 rounded-[10px] border border-border bg-card px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
               >
                 <PlusIcon className="size-4" />
@@ -96,5 +108,13 @@ export function GlobalHomeTab() {
         </section>
       </div>
     </div>
+
+      <CreateWorkspaceDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        onSubmit={handleCreateWorkspace}
+        isPending={isPending}
+      />
+    </>
   );
 }
